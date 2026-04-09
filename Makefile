@@ -1,69 +1,65 @@
-.PHONY: help, images
+.PHONY: help, check-prereqs
 help: ## Show this help
 	@egrep -h '\s##\s' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-images: ## Create Docker image dependencies
-	make builder
-	make scripter
-
-builder: ## Create the `iosevka` builder Docker image
-	docker build --no-cache -t iosevka/builder ./images/iosevka
-
-scripter: ## Create the `fontforge` scripter Docker image
-	docker build --no-cache -t fontforge/scripter ./images/fontforge
+check-prereqs: ## Check if all required tools are installed
+	@command -v node >/dev/null 2>&1 || { echo "❌ Node.js required but not installed. Install with: brew install node"; exit 1; }
+	@command -v npm >/dev/null 2>&1 || { echo "❌ npm required but not installed. Install with: brew install node"; exit 1; }
+	@command -v fontforge >/dev/null 2>&1 || { echo "❌ FontForge required but not installed. Install with: brew install fontforge"; exit 1; }
+	@command -v ttfautohint >/dev/null 2>&1 || { echo "❌ ttfautohint required but not installed. Install with: brew install ttfautohint"; exit 1; }
+	@command -v zip >/dev/null 2>&1 || { echo "❌ zip required but not installed. Install with: brew install zip"; exit 1; }
+	@echo "✅ All prerequisites installed"
 
 font: ## Run all build steps in correct order
-	make --ignore-errors ttf
-	make --ignore-errors nerd
-	make --ignore-errors package
+	@$(MAKE) check-prereqs
+	@$(MAKE) ttf
+	@$(MAKE) package
 
 ttf: ## Build ttf font from `Pragmasevka` custom configuration
-	docker run --rm \
-		-v pragmasevka-volume:/builder/dist/pragmasevka/TTF \
-		-v $(CURDIR)/private-build-plans.toml:/builder/private-build-plans.toml \
-		iosevka/builder \
-		npm run build -- ttf::pragmasevka
-	docker run --rm \
-		-v pragmasevka-volume:/scripter \
-		-v $(CURDIR)/punctuation.py:/scripter/punctuation.py \
-		fontforge/scripter \
-		python /scripter/punctuation.py ./pragmasevka
-	docker container create \
-		-v pragmasevka-volume:/ttf \
-		--name pragmasevka-dummy \
-		alpine
-	mkdir -p $(CURDIR)/dist/ttf
-	docker cp pragmasevka-dummy:/ttf $(CURDIR)/dist
-	docker rm pragmasevka-dummy
-	docker volume rm pragmasevka-volume
-	rm -rf $(CURDIR)/dist/ttf/*semibold*.ttf
-	rm -rf $(CURDIR)/dist/ttf/*black*.ttf
-	rm -rf $(CURDIR)/dist/ttf/punctuation.py
-	mv "$(CURDIR)/dist/ttf/pragmasevka-normalbolditalic.ttf" "$(CURDIR)/dist/ttf/pragmasevka-bolditalic.ttf"
-	mv "$(CURDIR)/dist/ttf/pragmasevka-normalboldupright.ttf" "$(CURDIR)/dist/ttf/pragmasevka-bold.ttf"
-	mv "$(CURDIR)/dist/ttf/pragmasevka-normalregularitalic.ttf" "$(CURDIR)/dist/ttf/pragmasevka-italic.ttf"
-	mv "$(CURDIR)/dist/ttf/pragmasevka-normalregularupright.ttf" "$(CURDIR)/dist/ttf/pragmasevka-regular.ttf"
+	@echo "🔨 Building Iosevka TTF fonts..."
+	# Download latest Iosevka release if not exists
+	@[ -d "$(CURDIR)/build/iosevka" ] || \
+		(echo "📥 Fetching latest Iosevka release..." && \
+		IOSEVKA_VERSION=$$(curl -sL "https://github.com/be5invis/Iosevka/releases" | \
+			grep -o 'releases/tag/v[^"]*' | head -1 | sed 's/.*v//'); \
+		echo "📦 Downloading Iosevka $$IOSEVKA_VERSION..." && \
+		mkdir -p $(CURDIR)/build && \
+		cd $(CURDIR)/build && \
+		curl -sL "https://github.com/be5invis/Iosevka/archive/refs/tags/v$$IOSEVKA_VERSION.tar.gz" | \
+			tar xz && \
+		mv "Iosevka-$$IOSEVKA_VERSION" iosevka)
+	# Copy build plan
+	@echo "📋 Copying private-build-plans.toml..."
+	@cp $(CURDIR)/private-build-plans.toml "$(CURDIR)/build/iosevka/private-build-plans.toml"
+	# Install dependencies and build
+	@echo "📦 Installing Iosevka dependencies..."
+	@cd "$(CURDIR)/build/iosevka" && npm install
+	@echo "🔧 Building TTF fonts..."
+	@cd "$(CURDIR)/build/iosevka" && npm run build -- ttf::pragmasevka --jCmd=4
+	# Run FontForge punctuation script
+	@echo "✒️  Patching punctuation glyphs..."
+	@fontforge -script "$(CURDIR)/punctuation.py" "$(CURDIR)/build/iosevka/dist/pragmasevka/TTF/pragmasevka"
+	# Create output directory
+	@mkdir -p $(CURDIR)/dist/ttf
+	# Copy TTF files
+	@echo "📂 Copying TTF files to dist/ttf..."
+	@cp "$(CURDIR)/build/iosevka/dist/pragmasevka/TTF"/*.ttf $(CURDIR)/dist/ttf/
+	# Remove semibold and black variants
+	@echo "🧹 Cleaning up unwanted variants..."
+	@rm -rf $(CURDIR)/dist/ttf/*semibold*.ttf
+	@rm -rf $(CURDIR)/dist/ttf/*black*.ttf
+	@rm -rf $(CURDIR)/dist/ttf/punctuation.py
+	# Rename files to match expected naming
+	@echo "🏷️  Renaming files..."
+	@mv "$(CURDIR)/dist/ttf/pragmasevka-normalbolditalic.ttf" "$(CURDIR)/dist/ttf/pragmasevka-bolditalic.ttf"
+	@mv "$(CURDIR)/dist/ttf/pragmasevka-normalboldupright.ttf" "$(CURDIR)/dist/ttf/pragmasevka-bold.ttf"
+	@mv "$(CURDIR)/dist/ttf/pragmasevka-normalregularitalic.ttf" "$(CURDIR)/dist/ttf/pragmasevka-italic.ttf"
+	@mv "$(CURDIR)/dist/ttf/pragmasevka-normalregularupright.ttf" "$(CURDIR)/dist/ttf/pragmasevka-regular.ttf"
+	@echo "✅ TTF build complete"
 
-nerd: ## Patch with Nerd Fonts glyphs
-	docker run --rm \
-		-v $(CURDIR)/dist/ttf:/in \
-		-v pragmasevka-volume:/out \
-		nerdfonts/patcher --complete --careful
-	docker container create \
-		-v pragmasevka-volume:/nerd \
-		--name pragmasevka-dummy \
-		alpine
-	docker cp pragmasevka-dummy:/nerd $(CURDIR)/dist
-	docker rm pragmasevka-dummy
-	docker volume rm pragmasevka-volume
-	mv "$(CURDIR)/dist/nerd/PragmasevkaNerdFont-Regular.ttf" "$(CURDIR)/dist/nerd/pragmasevka-nf-regular.ttf"
-	mv "$(CURDIR)/dist/nerd/PragmasevkaNerdFont-Italic.ttf" "$(CURDIR)/dist/nerd/pragmasevka-nf-italic.ttf"
-	mv "$(CURDIR)/dist/nerd/PragmasevkaNerdFont-Bold.ttf" "$(CURDIR)/dist/nerd/pragmasevka-nf-bold.ttf"
-	mv "$(CURDIR)/dist/nerd/PragmasevkaNerdFont-BoldItalic.ttf" "$(CURDIR)/dist/nerd/pragmasevka-nf-bolditalic.ttf"
-
-package: ## Pack fonts to ready-to-distribute archives
+package: ## Pack fonts to ready-to-distribute archive
 	zip -jr $(CURDIR)/dist/Pragmasevka.zip $(CURDIR)/dist/ttf/*.ttf
-	zip -jr $(CURDIR)/dist/Pragmasevka_NF.zip $(CURDIR)/dist/nerd/*.ttf
 
 clean:
 	rm -rf $(CURDIR)/dist/*
+	rm -rf $(CURDIR)/build/*
