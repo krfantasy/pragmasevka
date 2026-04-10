@@ -38,16 +38,22 @@ Luckly `Iosevka` allows some very sophisticated tweaking, so I have tried my bes
 
 ## I want one
 
-Head to [Releases](https://github.com/shytikov/pragmasevka/releases) and pick the archive you like: the bare build or [Nerd Fonts](https://www.nerdfonts.com/) enabled one.
+Head to [Releases](https://github.com/shytikov/pragmasevka/releases) and pick the archive you like.
 
 You can also build it locally by running:
 
 ```sh
-make images && make font
+make font
 ```
 
-If you want to use the font for web development, as a webfont, please use following instructions (shout out to @aperturerobotics):
+The build produces two variants:
 
+- **pragmasevka** – normal (quasi-proportional) spacing
+- **pragmasevka-mono** – term (monospace) spacing
+
+Both are included in the release archive.
+
+If you want to use the font for web development, as a webfont, please use following instructions (shout out to @aperturerobotics):
 
 ```bash
 # npm
