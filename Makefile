@@ -35,10 +35,11 @@ ttf: ## Build ttf font from `Pragmasevka` custom configuration
 	@echo "📦 Installing Iosevka dependencies..."
 	@cd "$(CURDIR)/build/iosevka" && npm install
 	@echo "🔧 Building TTF fonts..."
-	@cd "$(CURDIR)/build/iosevka" && npm run build -- ttf::pragmasevka --jCmd=4
+	@cd "$(CURDIR)/build/iosevka" && npm run build -- ttf::pragmasevka ttf::pragmasevka-mono --jCmd=4
 	# Run FontForge punctuation script
 	@echo "✒️  Patching punctuation glyphs..."
 	@fontforge -script "$(CURDIR)/punctuation.py" "$(CURDIR)/build/iosevka/dist/pragmasevka/TTF/pragmasevka"
+	@fontforge -script "$(CURDIR)/punctuation.py" "$(CURDIR)/build/iosevka/dist/pragmasevka-mono/TTF/pragmasevka-mono"
 	# Create output directory
 	@mkdir -p $(CURDIR)/dist/ttf
 	# Copy TTF files
@@ -55,6 +56,17 @@ ttf: ## Build ttf font from `Pragmasevka` custom configuration
 	@mv "$(CURDIR)/dist/ttf/pragmasevka-normalboldupright.ttf" "$(CURDIR)/dist/ttf/pragmasevka-bold.ttf"
 	@mv "$(CURDIR)/dist/ttf/pragmasevka-normalregularitalic.ttf" "$(CURDIR)/dist/ttf/pragmasevka-italic.ttf"
 	@mv "$(CURDIR)/dist/ttf/pragmasevka-normalregularupright.ttf" "$(CURDIR)/dist/ttf/pragmasevka-regular.ttf"
+	# Copy and process mono TTF files
+	@echo "📂 Copying pragmasevka-mono TTF files to dist/ttf..."
+	@cp "$(CURDIR)/build/iosevka/dist/pragmasevka-mono/TTF"/*.ttf $(CURDIR)/dist/ttf/
+	@echo "🧹 Cleaning up unwanted mono variants..."
+	@rm -rf $(CURDIR)/dist/ttf/*-mono*semibold*.ttf
+	@rm -rf $(CURDIR)/dist/ttf/*-mono*black*.ttf
+	@echo "🏷️  Renaming mono files..."
+	@mv "$(CURDIR)/dist/ttf/pragmasevka-mono-normalbolditalic.ttf" "$(CURDIR)/dist/ttf/pragmasevka-mono-bolditalic.ttf"
+	@mv "$(CURDIR)/dist/ttf/pragmasevka-mono-normalboldupright.ttf" "$(CURDIR)/dist/ttf/pragmasevka-mono-bold.ttf"
+	@mv "$(CURDIR)/dist/ttf/pragmasevka-mono-normalregularitalic.ttf" "$(CURDIR)/dist/ttf/pragmasevka-mono-italic.ttf"
+	@mv "$(CURDIR)/dist/ttf/pragmasevka-mono-normalregularupright.ttf" "$(CURDIR)/dist/ttf/pragmasevka-mono-regular.ttf"
 	@echo "✅ TTF build complete"
 
 package: ## Pack fonts to ready-to-distribute archive

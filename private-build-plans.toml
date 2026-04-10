@@ -1,6 +1,6 @@
 [buildPlans.pragmasevka]
 family = "Pragmasevka"
-spacing = "term"
+spacing = "normal"
 serifs = "sans"
 noCvSs = true
 exportGlyphNames = true
@@ -39,7 +39,7 @@ hintParams = ["-a", "qqq"]
     shape = 600
     menu = 600
     css = 600
-    
+
     [buildPlans.pragmasevka.weights.bold]
     shape = 800
     menu = 700
@@ -51,5 +51,61 @@ hintParams = ["-a", "qqq"]
     css = 900
 
     [buildPlans.pragmasevka.slopes]
+    upright = "default.Upright"
+    italic = "default.Italic"
+
+[buildPlans.pragmasevka-mono]
+family = "Pragmasevka Mono"
+spacing = "term"
+serifs = "sans"
+noCvSs = true
+exportGlyphNames = true
+
+hintParams = ["-a", "qqq"]
+
+    [buildPlans.pragmasevka-mono.widths.normal]
+    shape = 500
+    menu  = 5
+    css   = "normal"
+
+    [buildPlans.pragmasevka-mono.metricOverride]
+    leading = 1100
+    xHeight = 550
+
+    [buildPlans.pragmasevka-mono.ligations]
+    inherits="default-calt"
+    enables = [
+        "eqslasheq",
+        "kern-dotty",
+        "kern-bars",
+        "llggeq",
+         "--fast-chaining--"
+    ]
+    disables = ["slash-asterisk"]
+
+    [buildPlans.pragmasevka-mono.variants]
+    inherits = "ss08"
+
+    [buildPlans.pragmasevka-mono.weights.regular]
+    shape = 425
+    menu = 400
+    css = 400
+
+    [buildPlans.pragmasevka-mono.weights.semibold]
+    shape = 600
+    menu = 600
+    css = 600
+
+    [buildPlans.pragmasevka-mono.weights.bold]
+    shape = 800
+    menu = 700
+    css = 700
+
+    [buildPlans.pragmasevka-mono.weights.black]
+    shape = 900
+    menu = 900
+    css = 900
+
+    [buildPlans.pragmasevka-mono.slopes]
     upright = "default.Upright"
     italic = "default.Italic"
