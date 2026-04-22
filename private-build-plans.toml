@@ -5,8 +5,6 @@ serifs = "sans"
 noCvSs = true
 exportGlyphNames = true
 
-hintParams = ["-a", "qqq"]
-
     [buildPlans.pragmasevka.widths.normal]
     shape = 500
     menu  = 5
@@ -15,16 +13,10 @@ hintParams = ["-a", "qqq"]
     [buildPlans.pragmasevka.metricOverride]
     leading = 1100
     xHeight = 550
+    periodSize = 'blend(weight, [425, default_periodSize * 1.2], [800, default_periodSize * 1.1])'
 
     [buildPlans.pragmasevka.ligations]
-    inherits="default-calt"
-    enables = [
-        "eqslasheq",
-        "kern-dotty",
-        "kern-bars",
-        "llggeq",
-         "--fast-chaining--"
-    ]
+    inherits="dlig"
     disables = ["slash-asterisk"]
 
     [buildPlans.pragmasevka.variants]
@@ -35,20 +27,10 @@ hintParams = ["-a", "qqq"]
     menu = 400
     css = 400
 
-    [buildPlans.pragmasevka.weights.semibold]
-    shape = 600
-    menu = 600
-    css = 600
-
     [buildPlans.pragmasevka.weights.bold]
     shape = 800
     menu = 700
     css = 700
-
-    [buildPlans.pragmasevka.weights.black]
-    shape = 900
-    menu = 900
-    css = 900
 
     [buildPlans.pragmasevka.slopes]
     upright = "default.Upright"
@@ -61,8 +43,6 @@ serifs = "sans"
 noCvSs = true
 exportGlyphNames = true
 
-hintParams = ["-a", "qqq"]
-
     [buildPlans.pragmasevka-mono.widths.normal]
     shape = 500
     menu  = 5
@@ -71,16 +51,10 @@ hintParams = ["-a", "qqq"]
     [buildPlans.pragmasevka-mono.metricOverride]
     leading = 1100
     xHeight = 550
+    periodSize = 'blend(weight, [425, default_periodSize * 1.2], [800, default_periodSize * 1.1])'
 
     [buildPlans.pragmasevka-mono.ligations]
-    inherits="default-calt"
-    enables = [
-        "eqslasheq",
-        "kern-dotty",
-        "kern-bars",
-        "llggeq",
-         "--fast-chaining--"
-    ]
+    inherits = "dlig"
     disables = ["slash-asterisk"]
 
     [buildPlans.pragmasevka-mono.variants]
@@ -91,20 +65,10 @@ hintParams = ["-a", "qqq"]
     menu = 400
     css = 400
 
-    [buildPlans.pragmasevka-mono.weights.semibold]
-    shape = 600
-    menu = 600
-    css = 600
-
     [buildPlans.pragmasevka-mono.weights.bold]
     shape = 800
     menu = 700
     css = 700
-
-    [buildPlans.pragmasevka-mono.weights.black]
-    shape = 900
-    menu = 900
-    css = 900
 
     [buildPlans.pragmasevka-mono.slopes]
     upright = "default.Upright"

@@ -5,7 +5,6 @@ help: ## Show this help
 check-prereqs: ## Check if all required tools are installed
 	@command -v node >/dev/null 2>&1 || { echo "❌ Node.js required but not installed. Install with: brew install node"; exit 1; }
 	@command -v npm >/dev/null 2>&1 || { echo "❌ npm required but not installed. Install with: brew install node"; exit 1; }
-	@command -v fontforge >/dev/null 2>&1 || { echo "❌ FontForge required but not installed. Install with: brew install fontforge"; exit 1; }
 	@command -v ttfautohint >/dev/null 2>&1 || { echo "❌ ttfautohint required but not installed. Install with: brew install ttfautohint"; exit 1; }
 	@command -v zip >/dev/null 2>&1 || { echo "❌ zip required but not installed. Install with: brew install zip"; exit 1; }
 	@echo "✅ All prerequisites installed"
@@ -36,20 +35,11 @@ ttf: ## Build ttf font from `Pragmasevka` custom configuration
 	@cd "$(CURDIR)/build/iosevka" && npm install
 	@echo "🔧 Building TTF fonts..."
 	@cd "$(CURDIR)/build/iosevka" && npm run build -- ttf::pragmasevka ttf::pragmasevka-mono --jCmd=4
-	# Run FontForge punctuation script
-	@echo "✒️  Patching punctuation glyphs..."
-	@fontforge -script "$(CURDIR)/punctuation.py" "$(CURDIR)/build/iosevka/dist/pragmasevka/TTF/pragmasevka"
-	@fontforge -script "$(CURDIR)/punctuation.py" "$(CURDIR)/build/iosevka/dist/pragmasevka-mono/TTF/pragmasevka-mono"
 	# Create output directory
 	@mkdir -p $(CURDIR)/dist/ttf
 	# Copy TTF files
 	@echo "📂 Copying TTF files to dist/ttf..."
 	@cp "$(CURDIR)/build/iosevka/dist/pragmasevka/TTF"/*.ttf $(CURDIR)/dist/ttf/
-	# Remove semibold and black variants
-	@echo "🧹 Cleaning up unwanted variants..."
-	@rm -rf $(CURDIR)/dist/ttf/*semibold*.ttf
-	@rm -rf $(CURDIR)/dist/ttf/*black*.ttf
-	@rm -rf $(CURDIR)/dist/ttf/punctuation.py
 	# Rename files to match expected naming
 	@echo "🏷️  Renaming files..."
 	@mv "$(CURDIR)/dist/ttf/pragmasevka-normalbolditalic.ttf" "$(CURDIR)/dist/ttf/pragmasevka-bolditalic.ttf"
@@ -59,9 +49,6 @@ ttf: ## Build ttf font from `Pragmasevka` custom configuration
 	# Copy and process mono TTF files
 	@echo "📂 Copying pragmasevka-mono TTF files to dist/ttf..."
 	@cp "$(CURDIR)/build/iosevka/dist/pragmasevka-mono/TTF"/*.ttf $(CURDIR)/dist/ttf/
-	@echo "🧹 Cleaning up unwanted mono variants..."
-	@rm -rf $(CURDIR)/dist/ttf/*-mono*semibold*.ttf
-	@rm -rf $(CURDIR)/dist/ttf/*-mono*black*.ttf
 	@echo "🏷️  Renaming mono files..."
 	@mv "$(CURDIR)/dist/ttf/pragmasevka-mono-normalbolditalic.ttf" "$(CURDIR)/dist/ttf/pragmasevka-mono-bolditalic.ttf"
 	@mv "$(CURDIR)/dist/ttf/pragmasevka-mono-normalboldupright.ttf" "$(CURDIR)/dist/ttf/pragmasevka-mono-bold.ttf"
