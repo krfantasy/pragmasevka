@@ -22,6 +22,9 @@ exportGlyphNames = true
     [buildPlans.pragmasevka.variants]
     inherits = "ss08"
 
+        [buildPlans.pragmasevka.variants.design]
+        zero = "oval-reverse-slashed-split"
+
     [buildPlans.pragmasevka.weights.regular]
     shape = 425
     menu = 400
@@ -59,6 +62,9 @@ exportGlyphNames = true
 
     [buildPlans.pragmasevka-mono.variants]
     inherits = "ss08"
+
+        [buildPlans.pragmasevka-mono.variants.design]
+        zero = "oval-reverse-slashed-split"
 
     [buildPlans.pragmasevka-mono.weights.regular]
     shape = 425
