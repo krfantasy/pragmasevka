@@ -17,7 +17,6 @@ exportGlyphNames = true
 
     [buildPlans.pragmasevka.ligations]
     inherits="dlig"
-    disables = ["slash-asterisk"]
 
     [buildPlans.pragmasevka.variants]
     inherits = "ss08"
@@ -45,6 +44,7 @@ spacing = "term"
 serifs = "sans"
 noCvSs = true
 exportGlyphNames = true
+noLigation = true
 
     [buildPlans.pragmasevka-mono.widths.normal]
     shape = 500
@@ -55,10 +55,6 @@ exportGlyphNames = true
     leading = 1100
     xHeight = 550
     periodSize = 'blend(weight, [425, default_periodSize * 1.2], [800, default_periodSize * 1.1])'
-
-    [buildPlans.pragmasevka-mono.ligations]
-    inherits = "dlig"
-    disables = ["slash-asterisk"]
 
     [buildPlans.pragmasevka-mono.variants]
     inherits = "ss08"
